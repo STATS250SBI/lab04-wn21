@@ -1,0 +1,283 @@
+---
+title: "STATS 250 Lab 3 Proposal"
+author: "Lab Dream Team"
+date: "8/6/2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Learning Objectives
+
+### Statistical Learning Objectives
+1. Practice interpreting histograms and boxplots
+2. Revisit the five-number summary of a variable
+3. Explore scatterplots? **TODO: MAYBE NOT??**
+
+### R Learning Objectives
+1. Learn how to make a histogram in R
+2. Learn how to make a boxplot in R
+
+### Functions covered in this lab
+1. `hist()`
+2. `boxplot()`
+3. 
+
+### Weekly Advice
+When learning how to use a new program like R, the best advice we can give you is to **try things**. The worst thing that can happen is that you get an error that you can learn from. The way to learn things in this context is to play around, have fun, and **make mistakes**. 
+
+<hr />
+
+## Lab Tutorial
+
+We're back to hanging out with our penguin friends.
+```{r penguins}
+penguins <- read.csv(url("https://raw.githubusercontent.com/STATS250SBI/palmerpenguins/master/inst/extdata/penguins_NArm.csv"))
+```
+
+### Boxplots in R
+
+The command for making a boxplot in R is pretty simple: it's just `boxplot()`. To make a boxplot of a single variable, just give R the name of the data set, a dollar sign ($), then the name of the variable. Also provide the arguments `main` and `ylab` for a plot title and y-axis label.
+
+```{r bodyMassBoxplot}
+boxplot(penguins$body_mass_g,
+        main = "Boxplot of Penguin Body Mass",
+        ylab = "Body mass (g)")
+```
+
+Remember that boxplots are a graphical representation of the "five-number summary" which we can get from the `summary()` function:
+
+```{r bodyMassSummary}
+summary(penguins$body_mass_g)
+```
+
+You can always get just the one numerical summary you're looking for using the function for that specific summary:
+```{r summaryFunctions, error = T}
+min(penguins$body_mass_g)
+mean(penguins$body_mass_g)
+median(penguins$body_mass_g)
+max(penguins$body_mass_g)
+sd(penguins$body_mass_g)
+IQR(penguins$body_mass_g)
+```
+
+Sometimes we're interested in comparing two or more groups using "side-by-side" boxplots. We can compare the different species of penguins' body masses in this way, still using the `boxplot` function.
+
+```{r bodyMassBySpecies}
+boxplot(penguins$body_mass_g ~ penguins$species,
+        main = "Boxplots of Penguin Body Mass by Species",
+        ylab = "Body mass (g)",
+        xlab = "Species")
+```
+
+Notice the `~` (tilde) in the code here. Think of this as the word "by". In the code above, we're making boxplots of penguin body mass *by* penguin species. Notice that we're specifying the data set for each of these variables! If we didn't, R wouldn't know where to look for the variable.
+
+We could also make boxplots of body mass by sex:
+```{r bodyMassSex}
+boxplot(penguins$body_mass_g ~ penguins$sex,
+        main = "Boxplot of Penguin Body Mass by Sex",
+        ylab = "Body mass (g)",
+        xlab = "Sex")
+```
+
+We could also avoid typing `penguins$` twice by giving `boxplot()` an argument called `data`. Here's how that would look:
+
+```{r bodyMassSex_data}
+boxplot(body_mass_g ~ sex,
+        data = penguins,
+        main = "Boxplot of Penguin Body Mass by Sex",
+        ylab = "Body mass (g)",
+        xlab = "Sex")
+```
+
+Be careful to note that this only works when you're giving R a "formula" (the thing involving a tilde `~` -- we'll talk more about formulas later in the course). 
+
+Per usual, we can add colors to a plot using the `col` argument. Here's that species plot again:
+
+```{r bodyMassSpecies_colors}
+boxplot(penguins$body_mass_g ~ penguins$species,
+        main = "Boxplots of Penguin Body Mass by Species",
+        ylab = "Body mass (g)",
+        xlab = "Species",
+        col = c("darkorange1", "mediumorchid2", "darkcyan")
+)
+```
+
+### Histograms in R
+Histograms in R are also pretty easy -- you just use the `hist()` function.
+
+```{r bodyMassHist}
+hist(penguins$body_mass_g)
+```
+
+So here we've got a histogram. Notice that we didn't provide the `main`, `xlab`, and `ylab` arguments that we'd normally use for a plot title and an axis label, but R still gave us a title and labels. This is nice, but the labels are *horrible*: nobody (other than you) knows what `penguins$body_mass_g` means, so we don't want to use that as a title or axis label. The moral of the story is to *always provide `main`, `xlab`, and `ylab` arguments when making a plot!*
+
+Here's something better:
+
+```{r bodyMassHistLabels}
+hist(penguins$body_mass_g,
+     main = "Histogram of Penguin Body Mass",
+     xlab = "Body Mass (g)")
+```
+
+With histograms, it's often helpful to change the number of bins to get a different view of the data. We can sort of control the number of bins using the `breaks` argument. 
+
+```{r bodyMassHistBreaks}
+hist(penguins$body_mass_g,
+     main = "Histogram of Penguin Body Mass",
+     xlab = "Body Mass (g)",
+     breaks = 20)
+```
+
+So now we've got a lot more bins than in the original plot. There might not be exactly 20, though. R uses the `breaks` argument as a *suggestion* only -- it'll try to give you what you want, but (1) no promises and (2) it will prefer what it thinks is prettier. Your best strategy here is to play around with the number you give as `breaks` until you get close to what you want. 
+
+### How to find help in R
+R has built-in "documentation" for every function. If you want to find that documentation, you can Google it, but that takes too long. So it's better to use R's built in help! In the R console, just type a question mark `?` followed by the name of the function you want help with, then hit enter. For example, `?hist` will bring up the documentation for the `hist()` function. 
+
+The most useful feature of help is a list of a function's arguments what they do. You may not be able to fully understand some of the terms in the documentation just yet, but try it out and your lab instructor will be able to help!
+
+### Subsetting Data in R
+Above, we made a histogram for the body mass of all penguins in our data set. Sometimes we want to break up our data into "subsets" so we can look at only data in a particular category (e.g., only Gentoo penguins). To do this, we can use the `subset()` function in R.
+
+```{r subset1}
+gentooSubset <- subset(penguins, species == "Gentoo")
+```
+
+Here's how the above code chunk works: the newly-created object `gentooSubset` *gets* (`->`) the subset of `penguins` where the species variable is equal to "Gentoo". So the first argument of `subset()` is the data.frame you want to subset, and the second argument is the rule for which rows to take from the original data.frame.
+
+**Notice:** (1) we don't need to write `penguins$species` in the second argument of `subset()` because we told R we're working with `penguins` in the first argument; (2) the double equals (`==`) is *very* important in that second argument -- make sure you use it when subsetting data!
+
+```{r subsetProof}
+head(gentooSubset) # show the first few rows of gentoo
+table(gentooSubset$species) # show that we only have Gentoo penguins in gentoo
+```
+
+So now we can make a histogram of body masses of just Gentoo penguins:
+
+```{r gentooHist}
+hist(gentooSubset$body_mass_g, 
+     main = "Histogram of Gentoo Penguin Body Mass",
+     xlab = "Body Mass (g)",
+     col = "darkcyan")
+```
+
+<hr />
+
+## Try It!
+
+**Collaborators**: Replace this text with the names of anybody you collaborated with on this lab.
+
+In this Try It, we'll be using a data set we'll call `tuition` that contains information about **DESCRIBE DATA A LITTLE BIT BUT NOT MUCH**
+
+> **1.** We'll start by reading in the data. The data are stored in a file called `tuition_cost.csv`. You'll need to give the name of this file (*in quotes!*) to the appropriate R function. When you read it in, call the data set `tuition`. 
+
+*Answer:* 
+
+```{r tryIt1, error = T}
+# Replace this comment with code required for Try It 1. (Remember that this text is a comment, so R ignores it; you can delete it if you want.)
+```
+
+> **2.** Before we make graphs or numerical summaries, give an overview of the data set in 2-3 sentences. Use whatever tools you like to preview the contents of the data. The goal is for you to understand what's going on in the data set before working with it. Include any code in the chunk below.
+
+*Answer:* 
+
+```{r tryIt2, error = T}
+# Replace this comment with code required for Try It 2. (Remember that this text is a comment, so R ignores it; you can delete it if you want.)
+```
+
+Replace this text with your answer to Try It 2.
+
+> **3.** Make a boxplot of the variable which represents the total cost of attendance (room and board + tuition) for in-state students. Be sure to give it an appropriate title, axis labels, etc. Based on this boxplot, does it appear that the data are symmetric?
+
+*Answer:* 
+
+```{r tryIt3, error = T}
+# Replace this comment with code required for Try It 3. (Remember that this text is a comment, so R ignores it; you can delete it if you want.)
+```
+
+Replace this text with your answers to Try It 3.
+
+> **4.** Make a histogram of the same variable from Try It 3, being sure to include a proper title and axis labels. Play around with the `breaks` argument until you're satisfied that your histogram accurately reflects the shape of the data. Was your prediction about the symmetry of the data in Try It 3 accurate? In the future, do you think you'll use a boxplot to describe shape?
+
+*Answer:* 
+
+```{r tryIt4, error = T}
+# Replace this comment with code required for Try It 4. (Remember that this text is a comment, so R ignores it; you can delete it if you want.)
+```
+
+Replace this text with your answers to Try It 4.
+
+
+> **5.** Make a side-by-side boxplot of the total cost of attendance for in-state students by type of institution (for profit / public / private). As always, be sure to provide an appropriate title and axis labels. In 1-2 sentences, describe what you see.
+
+*Answer:* 
+
+```{r tryIt5, error = T}
+# Replace this comment with code required for Try It 5. (Remember that this text is a comment, so R ignores it; you can delete it if you want.)
+```
+
+Replace this text with your answers to Try It 5.
+
+> **6.** Subset the data to include only schools in Michigan and call the new subset `mi_tuition`. Make the same histogram as in Try It 4 using this subset of data. What do you notice about this histogram compared to the national histogram in Try It 4?
+
+*Hint:* Remember that computers are dumb, and you need to type things *exactly* as they are in the data. 
+
+*Answer:* 
+
+```{r tryIt6, error = T}
+# Get started by copying and pasting the code in the above chunk called subset1. Replace this comment with any code you need to answer the question. (Remember that this text is a comment, so R ignores it; you can delete it if you want.)
+```
+
+Replace this text with your written answer to Try It 6.
+
+
+## Dive Deeper
+In the Try It, you played around a little with data about trees in Ann Arbor. Now, we're going to have you dive a little deeper.
+
+> **1.** Based on the histograms you created in Try It 4 and Try It 6 (national and Michigan-only in-state total cost of attendance), compare the means and medians of the distributions. Which is bigger, which is smaller? Why? Use R to verify your answer. (Don't cheat and use R first -- actually try to figure it out from the histograms!)
+
+Replace this text with your discussion of means and medians *based only on histograms*
+
+```{r diveDeeper1}
+# Use this code chunk to use R to find the appropriate mean and medians
+```
+
+Replace this text with your discussion of whether R confirmed your initial thinking.
+
+
+> **2.** In the side-by-side boxplots you made in Try it 5, there's an outlier in the boxplot for public institutions: the College of  **THIS ONE MIGHT BE TOUGH; BRAINSTORM**
+**SOMETHING TO DO WITH A DISCUSSION OF TOSSING OUTLIERS?**
+
+Replace this text with your written answer to the question.
+
+> **3.** Make a frequency table of the common genus of the trees in the data. Based on your answer to Try It #5 (the two-way frequency table), what proportion of elm trees are in good health?
+
+```{r commonGenusTable, error = T}
+
+```
+
+*Write 1-2 sentences about your answer here*
+
+
+> **4.** Could this data set be used to answer the research question *"Are there more maple or oak trees in Nichols Arboretum[^1]"*? Why or why not? 
+
+*Write 1-2 sentences about your answer here*
+
+[^1]: "The Arb" is a University-owned nature area, and if you're on campus it's a great place for a peaceful, socially-distanced walk!
+
+> **5.** Could this data set be used to answer the research question *"What is the average height of trees on public land designated as 'landmark trees' in Ann Arbor"*? Why or why not? 
+
+*Write 1-2 sentences about your answer here*
+
+## Wrap-Up and Submission
+
+When you've finished the lab, click the **Knit** button one last time. Then, in the folder where you saved this .Rmd file when you downloaded it from Canvas, you'll see an HTML file with the same name (for example, `lab02.html`). **This is what you will upload to Canvas as your submission for Lab 2.**
+
+**TODO: Screenshots!**
