@@ -21,16 +21,19 @@ knitr::opts_chunk$set(echo = TRUE)
 2. Revisit the five-number summary of a variable
 
 ### R Learning Objectives
+1. Learn how to make a boxplot in R
+1. Learn how to find a specific numeric summary in R
 1. Learn how to make a histogram in R
-2. Learn how to make a boxplot in R
+1. Learn how to create a subset of a data set.
 
 ### Functions covered in this lab
+1. `boxplot()`
+1. `min()`, `mean()`, `median()`, `max()`, `sd()`, `IQR()`
 1. `hist()`
-2. `boxplot()`
-3. 
+1. `subset()`
 
 ### Weekly Advice
-When learning how to use a new program like R, the best advice we can give you is to **try things**. The worst thing that can happen is that you get an error that you can learn from. The way to learn things in this context is to play around, have fun, and **make mistakes**. 
+Lab 1 and Lab 2 are quickly and easily available to you. Our knowledge will continue to grow each week. Reviewing the prior weeks' R functions prior to working on the next lab might be useful. 
 
 <hr />
 
@@ -86,7 +89,7 @@ boxplot(penguins$body_mass_g ~ penguins$sex,
         xlab = "Sex")
 ```
 
-We could also avoid typing `penguins$` twice by giving `boxplot()` an argument called `data`. Here's how that would look:
+We could also avoid typing `penguins$` twice by giving `boxplot()` an argument called `data`. Here's how that would look: (and notice that we gave this chunk a new name: bodyMassSex_**data** so that the document will knit)
 
 ```{r bodyMassSex_data}
 boxplot(body_mass_g ~ sex,
@@ -98,7 +101,7 @@ boxplot(body_mass_g ~ sex,
 
 Be careful to note that using the `data` argument only works when you're giving R a "formula" (the thing involving a tilde `~` -- we'll talk more about formulas later in the course). 
 
-Per usual, we can add colors to a plot using the `col` argument. Here's that species plot again:
+Per usual, we can add colors to a plot using the `col` argument. Here's that species plot again: (again, noticing that the chunk is renamed bodyMassSpecies_**colors**; chunk names must be unique for the document to knit)
 
 ```{r bodyMassSpecies_colors}
 boxplot(penguins$body_mass_g ~ penguins$species,
@@ -203,7 +206,7 @@ Depending on your instruction method (in person, synchronous remote, asynchronou
 
 **Collaborators:** If applicable, replace this text with the names of anyone you collaborated with on this project.
 
-In this Try It, we'll be using a data set we'll call `tuition` that contains information about cost of attendance for 1,861 colleges and universities around the United States.
+In this Try It, we'll be using a data set we will call `tuition` that contains information about cost of attendance for 1,861 colleges and universities around the United States.
 
 > **1.** We'll start by reading in the data. The data are stored in a file called `tuition_cost.csv`. You'll need to give the name of this file (*in quotes!*) to `read.csv()`. When you read it in, call the data set `tuition`. **If you don't call it `tuition` you'll get errors later on.**
 
