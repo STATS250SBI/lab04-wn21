@@ -1,0 +1,283 @@
+---
+title: "STATS 250 Lab 4"
+author: "Lab Dream Team"
+date: "Week of 9/21/2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Learning Objectives
+
+### Statistical Learning Objectives
+1. Sampling with replacement versus sampling without replacement
+1. The Law of Large Numbers and expected values
+1. Scatterplots with linear associations
+1. The correlation coefficient
+
+### R Learning Objectives
+1. Creating a sequence of integers between two values.
+1. Learning how to randomly sample from a set, with replacement or without replacement.
+1. Creating a plot of (x,y) quantitative values.
+1. Finding the correlation coefficient between two quantitative variables.
+
+### Functions covered in this lab
+1. `sample()`
+1. `plot()`
+1. `cor()`
+
+### Weekly Advice
+In Lab 4, we are focusing a lot on the idea of random sampling. This idea of randomness tells us that, as you work with your lab instructor, your lab teammate, even with those on Piazza, anytime we consider random sampling, Your Mileage May Vary (YMMV). Keep that in mind as we run some of these chunks - we will not all get the same values!
+
+<hr />
+
+## Lab Tutorial
+
+Before we hang out with our penguin friends, let's discuss a bit about probability.
+
+### Creating Integer Sequences in R
+
+A vector (array) is a way to hold a collection of items in R. Think of a vector like a weekly pill organizer: it has "slots" for you to store multiple things in and to carry them around. We'll learn about vectors in more detail later on. Today, we're focusing on *numeric* vectors (vectors that contain numbers).
+
+In particular, we're going to focus on creating a sequence of consecutive integers (remember an integer is a number that can be written without a fraction/decimal component: 1, 2, -739, and 47 are integers, 5.2 is not). 
+
+Suppose we want to consider a six-sided die and the sample space of this six-sided die, which would include the values 1, 2, 3, 4, 5, and 6. A vector can be created to hold these values in order.
+
+```{r vectorsExample}
+1:6
+```
+You can see that this chunk created a vector that starts at the number 1, increases by 1, until the value of 6 is used. 
+
+### Sampling in R
+
+Now, let's roll that six-sided die. In R we will want to take a `sample()` from the vector 1:6. Try it out below.
+
+```{r sampleDieRoll}
+sample(1:6, size = 1)
+```
+What number did you get? Is it the same as your lab instructor? Your lab teammate? Probably not. This code will randomly pick one value from {1,2,3,4,5,6}. 
+
+### Replacement Versus No Replacement
+
+Now let's consider randomly selecting 6 values from the set {1,2,3,4,5,6}. Let's say that on our first pick, we randomly select the value 3. What happens to 3 when we are done? Do we toss it out, or put it back in the set before we make our next pick? Thus we need to make a distinction between sampling with replacement or without replacement of this 3. Let's see how that looks in the next two chunks. Run both chunks. What do you notice?
+
+```{r sampleNoReplacement}
+sample(1:6, size = 6, replace = F)
+```
+
+```{r sampleYesReplacement}
+sample(1:6, size = 6, replace = T)
+```
+
+When we tell R that we would like to sample with replacement (`replace = T`), notice that if we say, pick a 3 on the first draw, that we put the 3 back in the set before we make the next selection. Thus it is entirely possible that we could get that 3 again in the next selection. {3,3,3,3,3,3} is a valid possibility.
+
+When we tell R that we would like to sample without replacement (`replace = F`), notice that once say, 3 is selected, it is not put back in the set for us to draw from. 
+
+Which do you think is actually true for die rolling in real life? If we are wanting to simulate a die roll, should we sample with replacement or without replacement?
+
+### Law of Large Numbers
+
+The Law of Large Numbers says that as more observations are collected, i.e. as n gets larger and larger, the average will converge to a value known as the expected value. Let's roll a six-sided die once, then twice, then three times, then four times, then five times, and see the results.
+
+```{r dieRollsEx1, collapse = T}
+sample(1:6, size = 1, replace = T)
+sample(1:6, size = 2, replace = T)
+sample(1:6, size = 3, replace = T)
+sample(1:6, size = 4, replace = T)
+sample(1:6, size = 5, replace = T)
+```
+
+Can we find the average of each of these output lines? Sure. All we need to do is add up the values, then divide by the number of values we have. Do it really quick and see what you get for each line.
+
+If we run it a second time, will we get the exact same averages? Will we get the exact same result as our lab teammates? Probably not. Each time is a random sample, so YMMV. 
+
+Averaging these values by hand gets tiring very quickly. So let's have R help us by using the `mean()` function.
+
+```{r meanOfEx1, collapse = T}
+mean(sample(1:6, size = 1, replace = T))
+mean(sample(1:6, size = 2, replace = T))
+mean(sample(1:6, size = 3, replace = T))
+mean(sample(1:6, size = 4, replace = T))
+mean(sample(1:6, size = 5, replace = T))
+```
+
+It looks like the average is trying to do something, but we can't quite see what just yet. Perhaps we need to compare the values when we start with 1 die roll, then 2 die rolls, then 3, all the way up to a large number, say 300 die rolls. Don't worry too much about the coding and syntax in the next chunk, just observe how some of the things we talked about (like `sample()` and `mean()` are in the code). Then we are going to plot (more about `plot()` a bit later in lab) the values of *n* versus *mean*. So just run the chunk and see what you get.
+
+```{r plotOfMeanOfEx1}
+sixSidedDieRoll <- function(n) {
+  mean(sample(1:6, size = n, replace = T))
+}
+plot(sapply(1:300, sixSidedDieRoll), 
+     main = "Law of Large Numbers Example",
+     xlab = "Number of Six-Sided Dice",
+     ylab = "Average")
+```
+
+It looks like the values of the average are approaching a value between 3 and 4. This value is actually 3.5, and can be found using arithmetic by completing the formula (look at your knitted document for the nice formula): $$\sum_{i=1}^{n} x_{i} \cdot p_{i}$$ where $\Sigma$ represents a summation (+), *x* is the value and *p* is the corresponding probability. We will see this in section A.3. Don't worry about the notation; instead focus on how it is practiced. For this six-sided die, we should take the face value of the die, multiply it by its corresponding probability, and repeat. Then add up these values. The next chunk shows you how to compute the expected value of a six-sided die.
+
+```{r EVofSixSidedDie}
+1*(1/6) + 2*(1/6) + 3*(1/6) + 4*(1/6) + 5*(1/6) + 6*(1/6)
+```
+
+### Scatterplots in R
+
+We're back to hanging out with our penguin friends.
+```{r penguins}
+penguins <- read.csv(url("https://raw.githubusercontent.com/STATS250SBI/palmerpenguins/master/inst/extdata/penguins_NArm.csv"))
+```
+
+What we observed in the six-sided die rolling example was a scatterplot. A scatterplot is a way to display a quantivative explanatory (*x*) variable and a quantitative response (*y*) variable. The data is paired *(x,y)*, then each pair is plotted using an open circle. In terms of our data set `penguins`, each case would be represented by an open circle.
+
+In class, we are focusing our attention to scatterplots that appear to show a **linear** association. Let's see if there is a linear association between `bill_length_mm` and `body_mass_g`.
+
+```{r scatterplotExample}
+plot(penguins$bill_length_mm, penguins$body_mass_g,
+     main = "Scatterplot of Bill Length versus Body Mass of Penguins",
+     xlab = "Bill Length in mm",
+     ylab = "Body Mass in g")
+```
+
+The scatterplot of bill length versus body mass of penguins has a positive, linear association. The linear association is of moderate strength. There seem to be no unusual points (i.e. no outliers).
+
+### Correlation in R
+
+The correlation, denoted by the variable *r*, quantifies the strength of the linear relationship between the explanatory (*x*) and response (*y*) variable. As |r| (*the absolute value of r*) approaches 1, the linear relationship is stronger. Let's see what the correlation *r* is for our above variables by using the `cor()` function.
+
+```{r correlationExample}
+cor(penguins$bill_length_mm, penguins$body_mass_g)
+```
+
+## Try It!
+Depending on your instruction method (in person, synchronous remote, asynchronous remote), complete the following exercises collaboratively. 
+
+1. **In person:** Form groups of 2-4 with those around you (maintaining physical distance). Your instructor will provide additional details.
+1. **Synchronous remote:** You will be placed in a Zoom breakout room to work together in small groups. 
+1. **Asynchronous remote:** Join a Piazza lab group for asynchronous collaboration.
+
+**Collaborators:** If applicable, replace this text with the names of anyone you collaborated with on this project.
+
+
+>**1.** Create a two-way (contingency) table of penguin species by island. Then answer the following probability questions: If we select a penguin at random, <br />
+a) what is the probability that this penguin is not a Chinstrap? <br />
+b) what is the probability that this penguin is an Adelie or is from Dream island? <br />
+c) what is the probability that this penguin is from Biscoe island and is a Gentoo? <br />
+d) given that this penguin is from Dream island, that this penguin is also an Adelie? <br />
+
+```{r tryIt1, error = T}
+# Replace this comment with code required for Try It 1. (Remember that this text is a comment, so R ignores it; you can delete it if you want.) If you don't delete it, **start your code on a new line that doesn't start with #**
+
+```
+
+Replace this text with your answers to Try It 1.
+
+> **2.** While the six-sided die is the most popular die choice, another of note is an icosahedron, which is a 20-sided die. Below is the code chunk that we ran to plot the average die roll over time for a six-sided die. Change it up to reflect a 20-sided die. What do you think is the expected value for an icosahedron? Verify using arithmetic.
+
+*Answer:* 
+
+```{r tryIt2, error = T}
+sixSidedDieRoll <- function(n) {
+  mean(sample(1:6, size = n, replace = T))
+}
+plot(sapply(1:300, sixSidedDieRoll), 
+     main = "Law of Large Numbers Example",
+     xlab = "Number of Six-Sided Dice",
+     ylab = "Average")
+```
+
+Replace this text with your answers to Try It 2.
+
+> **3.** Now let's move on to some quantitative data about real estate. The data are stored in a file called `real_estate.csv`. You'll need to give the name of this file (*in quotes!*) to `read.csv()`. When you read it in, call the data set `real_estate`. **If you don't call it `real_estate` you'll get errors later on.**
+
+*Answer:* 
+
+```{r tryIt3, error = T}
+# Replace this comment with code required for Try It 3. (Remember that this text is a comment, so R ignores it; you can delete it if you want.) If you don't delete it, **start your code on a new line that doesn't start with #**
+
+```
+
+> **4.** Before we make graphs or numerical summaries, give an overview of the data set in 2-3 sentences. Use whatever tools you like to preview the contents of the data. The goal is for you to understand what's going on in the data set before working with it. Include any code in the chunk below. (*Disclaimer: There's not a right or wrong answer here -- just explore.*) You might want to revisit functions used in labs 1 and 2.
+
+*Answer:* 
+
+```{r tryIt4, error = T}
+# Replace this comment with code required for Try It 4. (Remember that this text is a comment, so R ignores it; you can delete it if you want.) If you don't delete it, **start your code on a new line that doesn't start with #**
+
+```
+
+Replace this text with your answer to Try It 4.
+
+> **5.** Make a scatterplot of the square feet of living space as the explanatory variable and price as the response variable. Be sure to give it an appropriate title, axis labels, etc. Based on this scatterplot, do you think there is a linear association between these two variables? As the square footage of living space increases, does the price increase or decrease? Would you consider this linear association weak, moderate, or strong?
+
+*Answer:* 
+
+```{r tryIt5, error = T}
+# Replace this comment with code required for Try It 5. (Remember that this text is a comment, so R ignores it; you can delete it if you want.) If you don't delete it, **start your code on a new line that doesn't start with #**
+
+```
+
+Replace this text with your answers to Try It 5.
+
+> **6.** Find the correlation coefficient for the two variables you used in Try It 5. Does your answer about the association being weak, moderate, or strong differ now that you see the correlation coefficient?
+
+*Answer:* 
+
+```{r tryIt6, error = T}
+# Replace this comment with code required for Try It 6. (Remember that this text is a comment, so R ignores it; you can delete it if you want.) If you don't delete it, **start your code on a new line that doesn't start with #**
+
+```
+
+Replace this text with your answers to Try It 6.
+
+
+## Dive Deeper
+In the Try It, you played around a little with data about real estate. Now, we're going to have you dive a little deeper.
+
+> **1.** Earlier in the Lab Tutorial, we discovered that the expected value of a six-sided die roll is 3.5. But we cannot actually roll a 3.5 on a six-sided die. We can only roll a 3 or a 4. Should we report the expected value as 3 (round down)? As 4 (round up)? As 3.5 (we should not round)? Explain your reasoning.
+
+Replace this text with your answer for Dive Deeper 1
+
+> **2.** Earlier in the Try It, we made a scatterplot and found a correlation cofficient for the explanatory variable square feet of living space and the response variable price. If we reversed the explanatory and response variables, that is, if we made the explanatory variable price and the response variable square feet of living space, would the correlation coefficient change? Would the linearity of the data change? 
+
+Replace this text with your written answer to Dive Deeper 2.
+
+> **3.** As a follow up to Dive Deeper 2, compute the correlation coefficient and make a scatterplot for the explanatory variable price and the response variable square feet of living space. Did the correlation coefficient change? Did the linearity of the data change? 
+
+Replace this text with your written answer to Dive Deeper 3.
+
+```{r diveDeeper3}
+# Replace this comment with code required for Dive Deeper 3. (Remember that this text is a comment, so R ignores it; you can delete it if you want.) If you don't delete it, **start your code on a new line that doesn't start with #**
+
+```
+
+> **4.** Do you think that we could use the real_estate data set to discuss commercial real estate, such as office buildings, medical facilities, schools, etc.? Explain your reasoning. 
+
+Replace this text with your written answer to Dive Deeper 4.
+
+## Wrap-Up and Submission
+
+At the top of the document, make sure you've changed the `author` field to your name (in quotes!). If you'd like, change the date as well.
+
+When you've finished the lab, click the **Knit** button one last time.
+
+
+### Submission instructions
+#### If you're using RStudio Cloud
+1. In the Files pane, check the box next to `lab03report.html`.
+2. Click More > Export...
+3. Click Download and save the file on your computer in a folder you'll remember and be able to find later. You can just call the file `lab03report.html` or whatever else you'd like (as  long as you remember what you called it).
+
+#### If you're using RStudio installed on your computer
+1. locate the `lab03report.html` file on your computer. The file will be saved in the location indicated at the top of the files pane.
+
+#### Submission to Canvas
+
+1. Click the "Assignments" panel on the left side of the page. Scroll to find "Lab 3", and open the assignment. Click "Submit Assignment". 
+2. Towards the bottom of the page, you'll be able to choose `lab03report.html` from the folder you saved it in from RStudio Cloud or noted if you're using RStudio Desktop. **You will only be able to upload a .html file -- do not upload any other file type.**
+3. Click "Submit Assignment". You're done! 
