@@ -243,7 +243,6 @@ Replace this text with your answer to Try It 4.
 
 Replace this text with your answers to Try It 5.
 
-<<<<<<< HEAD
 > **6.** Find the correlation coefficient for the two variables you used in Try It 5. Does your answer about the association being weak, moderate, or strong differ now that you see the correlation coefficient?
 
 *Answer:* 
