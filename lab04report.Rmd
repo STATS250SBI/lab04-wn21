@@ -23,11 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 1. The correlation coefficient
 
 ### R Learning Objectives
-<<<<<<< HEAD
 1. Creating a sequence of integers between two values.
-=======
-1. Creating a vector of integers between two values.
->>>>>>> 050e685d58e79ddc59ed14ae10b34ce36b8c8b9f
 1. Learning how to randomly sample from a set, with replacement or without replacement.
 1. Creating a plot of (x,y) quantitative values.
 1. Finding the correlation coefficient between two quantitative variables.
@@ -46,7 +42,6 @@ In Lab 4, we are focusing a lot on the idea of random sampling. This idea of ran
 
 Before we hang out with our penguin friends, let's discuss a bit about probability.
 
-<<<<<<< HEAD
 ### Creating Integer Sequences in R
 
 A vector (array) is a way to hold a collection of items in R. Think of a vector like a weekly pill organizer: it has "slots" for you to store multiple things in and to carry them around. We'll learn about vectors in more detail later on. Today, we're focusing on *numeric* vectors (vectors that contain numbers).
@@ -54,11 +49,6 @@ A vector (array) is a way to hold a collection of items in R. Think of a vector 
 In particular, we're going to focus on creating a sequence of consecutive integers (remember an integer is a number that can be written without a fraction/decimal component: 1, 2, -739, and 47 are integers, 5.2 is not). 
 
 Suppose we want to consider a six-sided die and the sample space of this six-sided die, which would include the values 1, 2, 3, 4, 5, and 6. A vector can be created to hold these values in order.
-=======
-### Creating Vectors in R
-
-A vector (array) is a way to hold a collection of numbers. Suppose we want to consider a six-sided die and the sample space of this six-sided die, which would include the values 1, 2, 3, 4, 5, and 6. A vector can be created to hold these values in order.
->>>>>>> 050e685d58e79ddc59ed14ae10b34ce36b8c8b9f
 
 ```{r vectorsExample}
 1:6
@@ -143,15 +133,10 @@ We're back to hanging out with our penguin friends.
 penguins <- read.csv(url("https://raw.githubusercontent.com/STATS250SBI/palmerpenguins/master/inst/extdata/penguins_NArm.csv"))
 ```
 
-<<<<<<< HEAD
 What we observed in the six-sided die rolling example was a scatterplot. A scatterplot is a way to display a quantivative explanatory (*x*) variable and a quantitative response (*y*) variable. The data is paired *(x,y)*, then each pair is plotted using an open circle. In terms of our data set `penguins`, each case would be represented by an open circle.
 
 In class, we are focusing our attention to scatterplots that appear to show a **linear** association. Let's see if there is a linear association between `bill_length_mm` and `body_mass_g`.
-=======
-What we observed in the six-sided die rolling example was a scatterplot. A scatterplot is a way to display an quantivative explanatory (*x*) variable and a quantitative response (*y*) variable. The data is paired *(x,y)*, then each pair is plotted using an open circle. In terms of our data set `penguins`, each case would be represented by an open circle.
 
-In class, we are focusing our attention to scatterplots that appear to show a **linear** association. Let's see is there is a linear association between `bill_length_mm` and `body_mass_g`.
->>>>>>> 050e685d58e79ddc59ed14ae10b34ce36b8c8b9f
 
 ```{r scatterplotExample}
 plot(penguins$bill_length_mm, penguins$body_mass_g,
@@ -164,11 +149,7 @@ The scatterplot of bill length versus body mass of penguins has a positive, line
 
 ### Correlation in R
 
-<<<<<<< HEAD
 The correlation, denoted by the variable *r*, quantifies the strength of the linear relationship between the explanatory (*x*) and response (*y*) variable. As |r| (*the absolute value of r*) approaches 1, the linear relationship is stronger. Let's see what the correlation *r* is for our above variables by using the `cor()` function.
-=======
-The correlation, denoted by the variable *r*, quantifies the strength of the linear relationship between the explanatory (*x*) and response (*y*) variable. As |r|(*the absolute value of r*) approaches 1, the linear relationship is stronger. Let's see what the correlation *r* is for our above variables by using the `cor()` function.
->>>>>>> 050e685d58e79ddc59ed14ae10b34ce36b8c8b9f
 
 ```{r correlationExample}
 cor(penguins$bill_length_mm, penguins$body_mass_g)
