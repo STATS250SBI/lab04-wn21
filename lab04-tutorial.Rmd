@@ -1,0 +1,163 @@
+---
+title: "STATS 250 Lab 4"
+author: "Lab Dream Team"
+date: "Week of 2/15/2021"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Learning Objectives
+
+## Statistical Learning Objectives
+1. Scatterplots with linear associations
+1. Discussing the correlation coefficient
+1. Discussion other important values in linear regression, such as R^2, SSE, MSE
+
+## R Learning Objectives
+1. Creating a plot of (x,y) quantitative values.
+1. Finding the correlation coefficient between two quantitative variables.
+
+## Functions covered in this lab
+1. `plot()`
+1. `cor()`
+1. `lm()`
+
+# Lab Tutorial
+
+## Scatterplots in R
+
+We're back to hanging out with our penguin friends.
+```{r penguins}
+penguins <- read.csv(url("https://raw.githubusercontent.com/STATS250SBI/palmerpenguins/master/inst/extdata/penguins_NArm.csv"), stringsAsFactors = TRUE)
+```
+
+In lecture, we are focusing our attention to scatterplots that appear to show a **linear** association between two numeric variables. Let's see if there is a linear association between `bill_length_mm` and `body_mass_g`.
+
+```{r scatterplotExample}
+plot(penguins$bill_length_mm, penguins$body_mass_g,
+     main = "Scatterplot of Bill Length versus Body Mass of Penguins",
+     xlab = "Bill Length in mm",
+     ylab = "Body Mass in g")
+```
+
+The scatterplot of bill length versus body mass of penguins has a positive, linear association. The linear association is of moderate strength. There seem to be no unusual points (i.e. no outliers).
+
+## The ~ Operator
+
+In R, we can use `~` (tilde, found underneath the Esc key in the top left corner of a U.S. keyboard) as an operator that can be read as "by" (or "versus"). This operator has use in making several plots we have discussed in the past.
+
+Let's go back to Lab 3's example, of making side-by-side boxplots of the numeric variable `body_mass_g` sorted by the levels of the categorical variable `species`. In Lab 3, we went through the process of making a subset of data for each species, which was cumbersome and error-prone. The `~` operator eliminates the need for a subset when creating side-by-side boxplots. We can now plot `body_mass_g` `~` (by) `species`. Let's try it out below.
+
+```{r tildeExampleBoxplot}
+boxplot(penguins$body_mass_g ~ penguins$species,
+        main = "Side-by-Side Boxplots of Body Mass by Penguin Species",
+        xlab = "Species",
+        ylab = "Body Mass in Grams")
+```
+
+Wonderfully easy! Of course, subsets are still important in real-life data management. But, we are free now to use the `~` when making side-by-side boxplots.
+
+Let's go back to the scatterplot we made last week and update it to use the `~` operator. We will also update the code to reflect that we can now send to `plot` the name of the data set using the `data` argument, letting us skip the `$`.
+
+```{r lengthMassPlot}
+plot(body_mass_g ~ bill_length_mm,
+     data = penguins,
+     main = "Scatterplot of Penguin Body Mass versus Bill Length",
+     xlab = "Bill Length (mm)",
+     ylab = "Body Mass in (g)")
+```
+
+Notice the order here: the *y* variable (`body_mass_g`) is written first, then the tilde, then the *x* variable (`bill_length_mm`). This is because for scatterplots, the order is **y by x** or **y ~ x**. Be *very* careful setting up scatterplots! 
+
+### Strength & Correlation
+
+In class, we have been observing scatterplots and commenting on the strength of the relationship. Earlier in our scatterplot, we observed a moderately-strong linear relationship, with no obvious outliers or clustering.
+
+We can quantify the strength by computing a value called the correlation coefficient, *R*. Let's do so using the function `cor()`:
+
+```{r lengthMassCor}
+cor(penguins$bill_length_mm, penguins$body_mass_g)
+```
+
+The correlation, denoted by the variable *R*, quantifies the strength of the linear relationship between the explanatory (*x*) and response (*y*) variable. As |R| (*the absolute value of R*) approaches 1, the linear relationship is stronger.
+
+### Correlation Matrix
+
+If we wanted to consider the correlation between multiple numeric variables, we could use `cor()` on every pair of them, but that's tedious. Instead, we'll compute a correlation *matrix*. In order to achieve this, we will have to make sure that the data we send to `cor()` is all numeric variables. It cannot contain categorical variables.
+
+Recall that the `penguins` data has both numeric and categorical variables. So to print a correlation matrix, first we should subset the `penguins` data to only consider numeric variables. Those variables are `bill_length_mm`, `bill_depth_mm`, `flipper_length_mm`, and `body_mass_g` (`year` is numeric or categorical, depending on how you think of it, but I hope we do agree that `year` is not particularly interesting as it is the year the data was collected). 
+
+To make this subset, we'll use the `subset()` function and the `select` argument. `select` is a vector of variable names in `penguins`. Then, we can find the correlation of this subset that we will call `numericPenguins`.
+
+```{r correlationMatrix}
+numericPenguins <- subset(penguins,
+                          select = c("bill_length_mm", "bill_depth_mm", 
+                                     "flipper_length_mm", "body_mass_g")
+                          )
+cor(numericPenguins)
+```
+
+Each "entry" in the correlation matrix is the correlation between the variables labeling that entry's row and column. So for example, the correlation between bill depth and bill length is about -0.229. 
+
+### Linear Regression
+
+We've actually already discussed most of what we need to perform linear regression in R, so let's jump right into it.
+
+We're going to perform a linear regression of body mass on bill length. This means we're going to use the bill length as the explanatory variable (x) and body mass as the response variable (y).
+We'll use the function `lm()` (for *l*inear *m*odel), and provide it a formula (`y ~ x`) and a `data` argument. We'll store that as an object called `reg1`. Then, to get detailed results, we'll use the `summary()` function.
+
+```{r lm1}
+reg1 <- lm(body_mass_g ~ bill_length_mm, data = penguins)
+summary(reg1)
+```
+
+As we read this table, the first two lines are just the code we typed in being displayed. The next piece dealing with *residuals* can be skipped over for now. We want the piece dealing with the **coefficients**. In the *coefficients* portion of the output, there are two rows of information with four columns. The column we will be dealing with in this lab is the **Estimate** column. 
+
+The first row of information is called the **`(Intercept)`**. This represents information about the vertical (y) intercept of the regression line. So if we go to the `Estimate` column in the `(Intercept)` row, we will get the value of the vertical (y) intercept for the least-squares regression line. Notice that the next row of information is called **`bill_length_mm`**, which is our explanatory (x) variable. This is a great way to verify that your logic of `y ~ x` was done correctly! This second row will always contain the name of the explanatory variable you chose. If we go to the `Estimate` column of the `bill_length_mm` row, we will get the value of the slope for the least-squares regression line.
+
+The next line has a value called the **residual standard error**, and this value is known as $s$. Then we will look at the line of output that has the **multiple R-squared** value -- *ignore the adjusted R-squared value*. 
+
+So again, the values we want to find from this output: 1) the vertical intercept of the least-squares regression line from our sample data; 2) the slope of the least-squares regression line from our sample data; 3) the residual standard error, 4) the multiple r-squared value which is known as the *coefficient of determination*. You can see your lecture notes to learn more about this $R^2$ value.
+
+Run the chunk. Did you get a vertical intercept of 388.845, a slope of 86.792, a residual standard error of 651.4, and a coefficient of determination of 0.3475?
+
+Then, when we're done with all of that, we can add the estimated regression line to our scatterplot by giving the model object to the `abline()` function.
+
+```{r lengthMass-Regression-Plot}
+plot(penguins$bill_length_mm, penguins$body_mass_g,
+     main = "Scatterplot of Penguin Body Mass versus Bill Length",
+     xlab = "Bill Length (mm)",
+     ylab = "Body Mass in (g)")
+abline(reg1)
+```
+
+
+## Code Cheat Sheet
+
+### `~`
+- Read as "by"
+- Used in side-by-side boxplots, scatterplots, and finding linear models
+- `y ~ x` is the correct syntax for linear; `numeric_variable ~` categorical_variable` is the correct syntax for side-by-side boxplots
+
+### `cor(x, y)`
+- Finds the correlation coefficient between the numeric variable *x* and the numeric variable *y*
+
+### `cor(numeric_data_frame)`
+- Prints a correlation matrix for a data frame with all numeric variables
+
+### `lm(y ~ x, data = data_name)`
+- Finds the linear model between *x* and *y* from `data_name`
+- You'll want to assign this a name in order to use it later
+
+### `summary(linear_model_name)`
+- Prints relevant values of a linear model
+
+### `abline(linear_model_name)`
+- Will plot the line found in `linear_model_name`
