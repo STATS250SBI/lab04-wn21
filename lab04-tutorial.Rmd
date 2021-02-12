@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Statistical Learning Objectives
 1. Scatterplots with linear associations
 1. Discussing the correlation coefficient
-1. Discussion other important values in linear regression, such as R^2, SSE, MSE
+1. Discussion other important values in linear regression, such as R^2.
 
 ## R Learning Objectives
 1. Creating a plot of (x,y) quantitative values.
@@ -35,7 +35,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 We're back to hanging out with our penguin friends.
 ```{r penguins}
-penguins <- read.csv(url("https://raw.githubusercontent.com/STATS250SBI/palmerpenguins/master/inst/extdata/penguins_NArm.csv"), stringsAsFactors = TRUE)
+penguins <- read.csv("penguins.csv", stringsAsFactors = TRUE)
 ```
 
 In lecture, we are focusing our attention to scatterplots that appear to show a **linear** association between two numeric variables. Let's see if there is a linear association between `bill_length_mm` and `body_mass_g`.
